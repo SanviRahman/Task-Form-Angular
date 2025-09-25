@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { ApiService } from './services/api.service';
 
 @Component({
   selector: 'app-root',
@@ -8,15 +8,33 @@ import { NgForm } from '@angular/forms';
 })
 export class AppComponent {
 
-  source:any;
+  source: any;
+  newUser: any = {};
 
   name: string = '';
   email: string = '';
   password: string = '';
   gender: string = '';
 
-  onSubmit(form: NgForm) {
-    this.source = form.value;
-    console.log(form.value);
+  constructor(private apiService: ApiService) { }
+
+  ngOnInit(): void {
+    this.apiService.getRecords().subscribe((data: any) => {
+      this.source = data;
+    });
+  }
+
+  onSubmit() {
+    const formData = new FormData();
+    formData.append('name', this.name);
+    formData.append('email', this.email);
+    formData.append('password', this.password);
+    formData.append('gender', this.gender);
+
+
+    this.apiService.sendFormData(formData).subscribe((data: any) => {
+      this.source = data;
+      console.log("Response: ", data);
+    });
   }
 }
